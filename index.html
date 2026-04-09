@@ -339,11 +339,16 @@ function lineHTML(val, isChanging) {
 }
 
 // ── 画整个卦 ──
-function renderHexagram(hexLines, changingLine, title, lowerTri, upperTri) {
-    // hexLines[0]=爻1(底) … hexLines[5]=爻6(顶)
+// lowerTag / upperTag: 可选附加标注，如 '体' '用'
+function renderHexagram(hexLines, changingLine, title, lowerTri, upperTri, lowerTag, upperTag) {
+    function tagBadge(tag) {
+        if (!tag) return '';
+        const color = tag === '体' ? '#1565c0' : '#8b1a1a';
+        return `<span style="font-size:0.72rem;padding:1px 5px;border-radius:3px;border:1px solid ${color};color:${color};margin-left:4px">${tag}卦</span>`;
+    }
     let h = `<div class="hex-block">
         <div class="hex-title">${title}</div>
-        <div class="tri-label">${upperTri.name}（上）</div>
+        <div class="tri-label">${upperTri.name}（上）${tagBadge(upperTag)}</div>
         <div class="hex-lines">`;
 
     for (let i = 5; i >= 0; i--) {
@@ -358,7 +363,7 @@ function renderHexagram(hexLines, changingLine, title, lowerTri, upperTri) {
     }
 
     h += `</div>
-        <div class="tri-label">${lowerTri.name}（下）</div>
+        <div class="tri-label">${lowerTri.name}（下）${tagBadge(lowerTag)}</div>
     </div>`;
     return h;
 }
@@ -404,9 +409,22 @@ function calculate() {
     const cLower = findTrigram([changedHex[0], changedHex[1], changedHex[2]]);
     const cUpper = findTrigram([changedHex[3], changedHex[4], changedHex[5]]);
 
-    // 判断哪一卦变了
-    const changedSide = changingLine <= 3 ? '下卦' : '上卦';
-    const changedTri  = changingLine <= 3 ? cLower : cUpper;
+    // ── 确定体卦 / 用卦 ──
+    // 含变爻的卦 = 用卦（对方/事件），不变的卦 = 体卦（自己）
+    let tiGua, yongGua, tiTag_lower, tiTag_upper;
+    if (changingLine <= 3) {
+        // 变爻在下卦 → 下卦是用卦，上卦是体卦
+        yongGua      = lower;
+        tiGua        = upper;
+        tiTag_lower  = '用';   // 下卦标注
+        tiTag_upper  = '体';   // 上卦标注
+    } else {
+        // 变爻在上卦 → 上卦是用卦，下卦是体卦
+        yongGua      = upper;
+        tiGua        = lower;
+        tiTag_lower  = '体';
+        tiTag_upper  = '用';
+    }
 
     // 互卦（取自本卦）
     // 下互卦：爻2,3,4 → 索引1,2,3
@@ -417,14 +435,7 @@ function calculate() {
     const upperNuc = findTrigram(unLines);
     const nucHex = [...lnLines, ...unLines];
 
-    // ── 组件清单 ──
-    const comps = [
-        { label:'本卦下卦', tri: lower    },
-        { label:'本卦上卦', tri: upper    },
-        { label: changedSide==='下卦' ? '变卦下卦' : '变卦上卦', tri: changedTri },
-        { label:'下互卦',   tri: lowerNuc },
-        { label:'上互卦',   tri: upperNuc }
-    ];
+    const changedSide = changingLine <= 3 ? '下卦' : '上卦';
 
     // ── 生成 HTML ──
     let html = '';
@@ -433,21 +444,23 @@ function calculate() {
     html += `<div class="card">
         <h2>推演过程</h2>
         <table>
-            <tr><th>项目</th><th>计算</th><th>卦象</th></tr>
+            <tr><th>项目</th><th>计算</th><th>卦象</th><th>角色</th></tr>
             <tr>
                 <td>第一数 → 下卦</td>
                 <td>${a1} ÷ 8，余 <strong>${lNum}</strong></td>
                 <td><strong>${lower.name}</strong>（${lower.element}）</td>
+                <td>${tiTag_lower === '体' ? '<span style="color:#1565c0;font-weight:bold">体卦（我）</span>' : '<span style="color:#8b1a1a;font-weight:bold">用卦（对方）</span>'}</td>
             </tr>
             <tr>
                 <td>第二数 → 上卦</td>
                 <td>${a2} ÷ 8，余 <strong>${uNum}</strong></td>
                 <td><strong>${upper.name}</strong>（${upper.element}）</td>
+                <td>${tiTag_upper === '体' ? '<span style="color:#1565c0;font-weight:bold">体卦（我）</span>' : '<span style="color:#8b1a1a;font-weight:bold">用卦（对方）</span>'}</td>
             </tr>
             <tr>
                 <td>变爻位置</td>
                 <td>${a1} + ${a2} = ${sum}，${sum} ÷ 6，余 <strong>${changingLine}</strong></td>
-                <td>第 <strong>${changingLine}</strong> 爻变（${changedSide}）</td>
+                <td colspan="2">第 <strong>${changingLine}</strong> 爻变（${changedSide}）</td>
             </tr>
         </table>
     </div>`;
@@ -456,23 +469,31 @@ function calculate() {
     html += `<div class="card">
         <h2>卦象展示</h2>
         <div class="hexagrams-row">
-            ${renderHexagram(origHex, changingLine, '本卦', lower, upper)}
+            ${renderHexagram(origHex, changingLine, '本卦', lower, upper, tiTag_lower, tiTag_upper)}
             ${renderHexagram(changedHex, null, '变卦', cLower, cUpper)}
             ${renderHexagram(nucHex, null, '互卦', lowerNuc, upperNuc)}
         </div>
         <p style="font-size:0.82rem;color:#999;text-align:center;margin-top:14px">
-            红色爻为变爻 | 互卦取本卦二三四爻（下互）、三四五爻（上互）
+            红色爻为变爻 ｜ 蓝色标注为体卦（我）｜ 红色标注为用卦（对方）
         </p>
     </div>`;
 
     // 五行归属
+    const comps = [
+        { label:`体卦·${tiGua === lower ? '下卦' : '上卦'}`,  tri: tiGua,    role:'体' },
+        { label:`用卦·${yongGua === lower ? '下卦' : '上卦'}`, tri: yongGua,  role:'用' },
+        { label:'下互卦', tri: lowerNuc, role:'' },
+        { label:'上互卦', tri: upperNuc, role:'' }
+    ];
+
     html += `<div class="card">
         <h2>五行归属</h2>
         <table>
-            <tr><th>部分</th><th>卦名</th><th>五行</th></tr>`;
+            <tr><th>角色</th><th>卦名</th><th>五行</th></tr>`;
     for (const c of comps) {
+        const roleColor = c.role === '体' ? 'color:#1565c0;font-weight:bold' : c.role === '用' ? 'color:#8b1a1a;font-weight:bold' : '';
         html += `<tr>
-            <td>${c.label}</td>
+            <td style="${roleColor}">${c.label}</td>
             <td><strong>${c.tri.name}</strong></td>
             <td>${elTag(c.tri.element)}</td>
         </tr>`;
@@ -487,20 +508,22 @@ function calculate() {
         </div>
     </div>`;
 
-    // 生克分析
-    const selfEl = lower.element;
+    // 生克分析（以体卦为"我"）
+    const selfEl = tiGua.element;
     html += `<div class="card">
         <h2>生克分析</h2>
         <div class="info-box">
-            以 <strong>本卦下卦「${lower.name}」（${lower.element}）</strong> 为「我」<br>
+            以 <strong style="color:#1565c0">体卦「${tiGua.name}」（${tiGua.element}）</strong> 为「我」（自己）<br>
+            <strong style="color:#8b1a1a">用卦「${yongGua.name}」（${yongGua.element}）</strong> 为对方 / 事件<br>
             生我者为吉 ｜ 同我者为吉 ｜ 我克者小吉 ｜ 我生者为凶 ｜ 克我者为凶
         </div>
         <div class="result-grid">`;
 
     for (const c of comps.slice(1)) {
         const r = getRelation(selfEl, c.tri.element);
+        const roleLabel = c.role === '用' ? '（对方）' : '';
         html += `<div class="result-item ${r.cls}">
-            <span class="item-name">${c.label}「<strong>${c.tri.name}</strong>」${elTag(c.tri.element)}</span>
+            <span class="item-name">${c.label}${roleLabel}「<strong>${c.tri.name}</strong>」${elTag(c.tri.element)}</span>
             <span class="item-rel">${r.rel}</span>
             <span class="item-verdict">${r.verdict}</span>
         </div>`;
