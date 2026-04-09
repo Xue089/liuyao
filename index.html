@@ -303,8 +303,77 @@ const TRIGRAMS = {
 
 // 相生: 金→水→木→火→土→金
 const GENERATES = { '金':'水','水':'木','木':'火','火':'土','土':'金' };
-// 相克: 金→木→木→土→土→水→水→火→火→金
+// 相克: 金→木→土→水→火→金
 const OVERCOMES = { '金':'木','木':'土','土':'水','水':'火','火':'金' };
+
+// ── 六十四卦数据 key:'上卦数,下卦数' ──
+// urlId 来自 yilusoso.com/lssg/{urlId}/
+const HEXAGRAMS = {
+    '1,1':{num:1, name:'乾',  urlId:1,   meaning:'刚健纯阳，自强不息。运势旺盛，宜积极进取，防骄溢。'},
+    '1,2':{num:10,name:'履',  urlId:46,  meaning:'如履薄冰，谨慎而行。局面微妙，礼貌谨慎，稳健应对可化险为夷。'},
+    '1,3':{num:13,name:'同人',urlId:55,  meaning:'志同道合，开诚布公。联合众人共同努力，团队协力可成大事。'},
+    '1,4':{num:25,name:'无妄',urlId:96,  meaning:'顺乎天道，不妄为。守正持信，顺其自然，不可投机取巧。'},
+    '1,5':{num:44,name:'姤',  urlId:157, meaning:'不期而遇，阴柔暗长。偶发因素影响大，注意细节，防小人得势。'},
+    '1,6':{num:6, name:'讼',  urlId:34,  meaning:'争讼不息，意见相左。双方存在矛盾，宜退让求和，避免正面冲突。'},
+    '1,7':{num:33,name:'遁',  urlId:120, meaning:'明哲保身，适时退隐。形势不利，宜退避保全，暂忍避锋。'},
+    '1,8':{num:12,name:'否',  urlId:52,  meaning:'天地不交，阴阳闭塞。形势不顺，沟通受阻，宜保守守成，静待时机。'},
+    '2,1':{num:43,name:'夬',  urlId:154, meaning:'以刚决柔，果断决策。需下定决心果断处理，去除隐患，不可拖延。'},
+    '2,2':{num:58,name:'兑',  urlId:199, meaning:'喜悦和悦，言辞得利。人际愉快，沟通顺畅，喜事临门。'},
+    '2,3':{num:49,name:'革',  urlId:172, meaning:'革故鼎新，变革创新。旧事物需革除，迎接变革，时机成熟则顺利。'},
+    '2,4':{num:17,name:'随',  urlId:67,  meaning:'顺应时势，灵活跟从。不宜固执，顺应变化随机应变，则诸事皆利。'},
+    '2,5':{num:28,name:'大过',urlId:105, meaning:'重担过重，危机四伏。压力超限，需及时调整策略，防止崩溃。'},
+    '2,6':{num:47,name:'困',  urlId:166, meaning:'身陷困境，穷困潦倒。处境艰难，坚守信念，君子处困不失节。'},
+    '2,7':{num:31,name:'咸',  urlId:114, meaning:'男女感应，情意相通。感情顺遂，与人有共鸣，合作交流皆顺利。'},
+    '2,8':{num:45,name:'萃',  urlId:160, meaning:'人心凝聚，众力合一。聚合资源人心，形成合力，集体行动可成。'},
+    '3,1':{num:14,name:'大有',urlId:58,  meaning:'大有收获，光明昌盛。运势旺盛，成果丰厚，乘势而上大有作为。'},
+    '3,2':{num:38,name:'睽',  urlId:139, meaning:'意见相左，背道而行。双方分歧明显，暂不宜合作，各自独立行动为宜。'},
+    '3,3':{num:30,name:'离',  urlId:111, meaning:'光明附丽，文明昌盛。依附正确方向，充分发挥才能，前途光明。'},
+    '3,4':{num:21,name:'噬嗑',urlId:82,  meaning:'当机立断，排除障碍。有阻碍须果断克服，适合用强力手段解决问题。'},
+    '3,5':{num:50,name:'鼎',  urlId:175, meaning:'鼎新革旧，建立新局。整合资源，稳固新格局，谋求长远发展。'},
+    '3,6':{num:64,name:'未济',urlId:217, meaning:'事未完成，尚在进行。事情尚未结束，继续努力，最终可成但需谨慎。'},
+    '3,7':{num:56,name:'旅',  urlId:193, meaning:'客旅异乡，低调谨慎。处于陌生环境，需谦逊低调，灵活应变。'},
+    '3,8':{num:35,name:'晋',  urlId:128, meaning:'阳光普照，晋升进步。事业顺利上升，形势光明，宜大力推进。'},
+    '4,1':{num:34,name:'大壮',urlId:123, meaning:'阳刚强盛，势不可挡。力量充沛，气势旺盛，但防过刚易折。'},
+    '4,2':{num:54,name:'归妹',urlId:187, meaning:'嫁娶顺应，位分有别。认清自己的角色与位置，顺应规则切勿僭越。'},
+    '4,3':{num:55,name:'丰',  urlId:190, meaning:'雷电交加，繁盛丰大。处于鼎盛时期，居安思危，盛极须防衰退。'},
+    '4,4':{num:51,name:'震',  urlId:178, meaning:'雷震惊惧，警醒奋进。突发变故或警示，保持警觉，在震动中奋进。'},
+    '4,5':{num:32,name:'恒',  urlId:117, meaning:'持之以恒，坚守常道。坚持到底不轻易改变，长久努力终有回报。'},
+    '4,6':{num:40,name:'解',  urlId:145, meaning:'解除困境，雨过天晴。困难开始解除，迎来转机，宜果断行动。'},
+    '4,7':{num:62,name:'小过',urlId:211, meaning:'行事偏过，小有差失。宜谨慎守成，大事宜缓，小事可行。'},
+    '4,8':{num:16,name:'豫',  urlId:64,  meaning:'顺势喜悦，万众归心。形势乐观，顺水推舟，防懈怠与松散。'},
+    '5,1':{num:9, name:'小畜',urlId:43,  meaning:'积累蓄势，力量尚小。时机不足，继续蓄积力量，不宜大动作。'},
+    '5,2':{num:61,name:'中孚',urlId:208, meaning:'内心诚实，诚信感人。以诚信为本，内外一致，诚心感化他人必有所获。'},
+    '5,3':{num:37,name:'家人',urlId:136, meaning:'家道正位，内外和谐。家庭或内部秩序为关键，安内可攘外。'},
+    '5,4':{num:42,name:'益',  urlId:151, meaning:'上益于下，获得增益。有贵人相助，事情顺利推进，是积极行动的好时机。'},
+    '5,5':{num:57,name:'巽',  urlId:196, meaning:'随风入穴，柔顺渗透。以柔克刚，灵活变通，潜移默化地推进。'},
+    '5,6':{num:59,name:'涣',  urlId:202, meaning:'涣散冰释，凝聚人心。原有僵局开始松动，需凝聚人心，共渡难关。'},
+    '5,7':{num:53,name:'渐',  urlId:184, meaning:'循序渐进，稳步前行。不宜操之过急，按部就班，稳扎稳打终成。'},
+    '5,8':{num:20,name:'观',  urlId:77,  meaning:'冷静观察，审时度势。先观察清楚再行动，深思熟虑，不宜轻举妄动。'},
+    '6,1':{num:5, name:'需',  urlId:31,  meaning:'等待时机，云雨将至。时机未到，耐心等候，急不得。'},
+    '6,2':{num:60,name:'节',  urlId:205, meaning:'节制有度，恰如其分。凡事有节制，把握分寸，过度则反为害。'},
+    '6,3':{num:63,name:'既济',urlId:214, meaning:'万事已成，功德圆满。事情已告完成，保持成果，防止盛极而衰。'},
+    '6,4':{num:3, name:'屯',  urlId:25,  meaning:'草木初生，艰难起步。万事开头难，需耐心等待，切忌冒进。'},
+    '6,5':{num:48,name:'井',  urlId:169, meaning:'水源不竭，根基稳固。基础稳固，资源充足，维护好根基，不可废弃。'},
+    '6,6':{num:29,name:'坎',  urlId:108, meaning:'重重险陷，处境艰难。困难重重，需坚守信念，凭诚信智慧方能脱困。'},
+    '6,7':{num:39,name:'蹇',  urlId:142, meaning:'前进艰难，险阻重重。遭遇重大阻碍，宜暂停反思，寻求贵人协助。'},
+    '6,8':{num:8, name:'比',  urlId:40,  meaning:'亲密联合，众志成城。与人合作融洽，得到支持，团结则成。'},
+    '7,1':{num:26,name:'大畜',urlId:99,  meaning:'厚积薄发，蓄德大成。实力雄厚，蓄势待发，时机一到可大展宏图。'},
+    '7,2':{num:41,name:'损',  urlId:148, meaning:'减损下益上，损小得大。短期有所牺牲，长远有所得，诚心付出终有回报。'},
+    '7,3':{num:22,name:'贲',  urlId:87,  meaning:'文采修饰，外表华美。注重形象与包装，内外兼修，防华而不实。'},
+    '7,4':{num:27,name:'颐',  urlId:102, meaning:'养育保护，谨慎口食。注意调养身心，谨言慎行，修身养德。'},
+    '7,5':{num:18,name:'蛊',  urlId:70,  meaning:'积弊已久，需整治改革。现状存在积弊，需下决心整顿，破旧立新。'},
+    '7,6':{num:4, name:'蒙',  urlId:28,  meaning:'启蒙待教，摸索学习。尚处摸索期，宜虚心求教，磨砺前行。'},
+    '7,7':{num:52,name:'艮',  urlId:181, meaning:'止而不动，适可而止。该停则停，静下心来思考，不可盲目前进。'},
+    '7,8':{num:23,name:'剥',  urlId:90,  meaning:'小人道盛，阳气剥落。形势不利，宜收缩防守，等待时机，不可冒险。'},
+    '8,1':{num:11,name:'泰',  urlId:49,  meaning:'天地交泰，通达顺遂。大吉，万事顺畅，是推进事业的绝佳时机。'},
+    '8,2':{num:19,name:'临',  urlId:73,  meaning:'居高临下，大有可为。时机渐至，积极主动进取，趁好势大力推进。'},
+    '8,3':{num:36,name:'明夷',urlId:131, meaning:'光明受伤，处境逆难。正处逆境，宜韬光养晦，忍辱负重，等待时机。'},
+    '8,4':{num:24,name:'复',  urlId:93,  meaning:'一阳来复，否极泰来。低谷已过，事情逐渐好转，是重新出发的时机。'},
+    '8,5':{num:46,name:'升',  urlId:163, meaning:'踏实上升，厚积薄发。踏实努力逐步晋升，顺势而为，终有回报。'},
+    '8,6':{num:7, name:'师',  urlId:37,  meaning:'统兵行军，严明纪律。需要组织协调，统一步骤，宜找有威望的人主导。'},
+    '8,7':{num:15,name:'谦',  urlId:61,  meaning:'谦逊低调，柔顺有德。以谦让之道待人，终得人心，有所成就。'},
+    '8,8':{num:2, name:'坤',  urlId:21,  meaning:'厚德载物，柔顺承受。宜顺势而为，稳守本分，以柔制刚。'},
+};
 
 function toTrigramNum(n) {
     const r = Math.abs(Math.floor(n)) % 8;
@@ -317,6 +386,14 @@ function findTrigram(lines) {
             return TRIGRAMS[parseInt(k)];
     }
     return TRIGRAMS[8];
+}
+
+function findTrigramNum(lines) {
+    for (const [k, t] of Object.entries(TRIGRAMS)) {
+        if (t.lines[0]===lines[0] && t.lines[1]===lines[1] && t.lines[2]===lines[2])
+            return parseInt(k);
+    }
+    return 8;
 }
 
 function getRelation(selfEl, otherEl) {
@@ -406,8 +483,12 @@ function calculate() {
     const changedHex = [...origHex];
     changedHex[changingLine - 1] = changedHex[changingLine - 1] === 1 ? 0 : 1;
 
-    const cLower = findTrigram([changedHex[0], changedHex[1], changedHex[2]]);
-    const cUpper = findTrigram([changedHex[3], changedHex[4], changedHex[5]]);
+    const cLowerLines = [changedHex[0], changedHex[1], changedHex[2]];
+    const cUpperLines = [changedHex[3], changedHex[4], changedHex[5]];
+    const cLower = findTrigram(cLowerLines);
+    const cUpper = findTrigram(cUpperLines);
+    const cLowerNum = findTrigramNum(cLowerLines);
+    const cUpperNum = findTrigramNum(cUpperLines);
 
     // ── 确定体卦 / 用卦 ──
     // 含变爻的卦 = 用卦（对方/事件），不变的卦 = 体卦（自己）
@@ -433,6 +514,8 @@ function calculate() {
     const unLines = [origHex[2], origHex[3], origHex[4]];
     const lowerNuc = findTrigram(lnLines);
     const upperNuc = findTrigram(unLines);
+    const lnNum = findTrigramNum(lnLines);
+    const unNum = findTrigramNum(unLines);
     const nucHex = [...lnLines, ...unLines];
 
     const changedSide = changingLine <= 3 ? '下卦' : '上卦';
@@ -530,6 +613,35 @@ function calculate() {
     }
 
     html += `</div></div>`;
+
+    // ── 六十四卦综合解析 ──
+    const benHex  = HEXAGRAMS[`${uNum},${lNum}`]   || {num:'?',name:'未知',urlId:'',meaning:''};
+    const bianHex = HEXAGRAMS[`${cUpperNum},${cLowerNum}`] || {num:'?',name:'未知',urlId:'',meaning:''};
+    const huHex   = HEXAGRAMS[`${unNum},${lnNum}`]  || {num:'?',name:'未知',urlId:'',meaning:''};
+
+    function hexCard(role, roleDesc, hexData, color) {
+        const link = hexData.urlId
+            ? `<a href="https://www.yilusoso.com/lssg/${hexData.urlId}/" target="_blank" style="font-size:0.82rem;color:${color};text-decoration:underline;margin-left:8px">详细解读 →</a>`
+            : '';
+        return `<div style="border:1px solid #ddd;border-radius:8px;padding:16px;background:#fafafa;border-left:4px solid ${color}">
+            <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+                <span style="font-size:1rem;font-weight:bold;color:${color}">${role}</span>
+                <span style="font-size:1.15rem;font-weight:bold;color:#2a1a0a">第${hexData.num}卦·${hexData.name}卦</span>
+                <span style="font-size:0.82rem;color:#888">${roleDesc}</span>
+                ${link}
+            </div>
+            <div style="font-size:0.95rem;color:#4a3a2a;line-height:1.8">${hexData.meaning}</div>
+        </div>`;
+    }
+
+    html += `<div class="card">
+        <h2>六十四卦综合解析</h2>
+        <div style="display:grid;gap:14px">
+            ${hexCard('本卦', '当前整体情况 · 所处环境与局势', benHex, '#1565c0')}
+            ${hexCard('变卦', '事情发展趋势 · 未来走向与结果', bianHex, '#8b1a1a')}
+            ${hexCard('互卦', '内部隐藏机制 · 中间过程与暗线', huHex, '#2e7d32')}
+        </div>
+    </div>`;
 
     const el = document.getElementById('result');
     el.innerHTML = html;
