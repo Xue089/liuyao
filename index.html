@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>六爻起卦</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'STSong', 'SimSun', 'Songti SC', 'Georgia', serif;
+            background: linear-gradient(135deg, #f5f0e8 0%, #ede0c4 100%);
+            color: #2a1a0a;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container { max-width: 960px; margin: 0 auto; }
+
+        h1 {
+            text-align: center;
+            font-size: 2.4rem;
+            color: #8b1a1a;
+            margin-bottom: 6px;
+            letter-spacing: 4px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7a5a3a;
+            margin-bottom: 28px;
+            font-size: 0.95rem;
+            letter-spacing: 2px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.92);
+            border: 1px solid #c8a060;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+        }
+
+        .card h2 {
+            color: #8b1a1a;
+            font-size: 1.2rem;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #c8a060;
+            letter-spacing: 2px;
+        }
+
+        /* ── Input ── */
+        .input-section { text-align: center; }
+
+        .prompt-text {
+            font-size: 1.6rem;
+            color: #5a3a1a;
+            margin-bottom: 24px;
+            font-weight: bold;
+            letter-spacing: 3px;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .input-group label { font-size: 0.88rem; color: #7a5a3a; letter-spacing: 1px; }
+
+        input[type="number"] {
+            width: 140px;
+            padding: 10px 14px;
+            font-size: 1.4rem;
+            border: 2px solid #c8a060;
+            border-radius: 6px;
+            text-align: center;
+            background: #fffdf8;
+            color: #2a1a0a;
+            font-family: inherit;
+            transition: border-color .2s;
+        }
+
+        input[type="number"]:focus { outline: none; border-color: #8b1a1a; }
+
+        .btn {
+            padding: 12px 40px;
+            font-size: 1.1rem;
+            background: #8b1a1a;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            letter-spacing: 4px;
+            transition: background .2s;
+            margin-bottom: 2px;
+        }
+
+        .btn:hover { background: #6b1010; }
+
+        /* ── Hexagram display ── */
+        .hexagrams-row {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .hex-block { display: flex; flex-direction: column; align-items: center; }
+
+        .hex-title {
+            font-size: 1.05rem;
+            font-weight: bold;
+            color: #5a3a1a;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .tri-label {
+            font-size: 0.8rem;
+            color: #999;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        .hex-lines {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            margin: 6px 0;
+        }
+
+        .hex-line {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .line-num {
+            font-size: 0.72rem;
+            color: #bbb;
+            width: 14px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        /* SVG-style line blocks */
+        .lseg {
+            height: 9px;
+            border-radius: 5px;
+            background: #3a2a1a;
+            display: inline-block;
+        }
+
+        .yang-seg { width: 84px; }
+        .yin-seg  { width: 38px; }
+        .gap      { width: 8px; display: inline-block; }
+
+        .changing-line .lseg { background: #cc1818; }
+
+        .change-mark {
+            font-size: 0.72rem;
+            color: #cc1818;
+            margin-left: 3px;
+        }
+
+        .divider {
+            width: 104px;
+            height: 1px;
+            background: #c8a060;
+            margin: 2px 22px;
+        }
+
+        /* ── Table ── */
+        table { width: 100%; border-collapse: collapse; }
+
+        th {
+            background: #f0e0c0;
+            color: #5a3a1a;
+            padding: 9px 12px;
+            border: 1px solid #c8a060;
+            font-size: 0.92rem;
+            letter-spacing: 1px;
+        }
+
+        td {
+            padding: 9px 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+        tr:nth-child(even) td { background: #faf5ec; }
+
+        .el { font-weight: bold; font-size: 1.05rem; }
+        .el-金 { color: #b08010; }
+        .el-木 { color: #1e8020; }
+        .el-水 { color: #1060cc; }
+        .el-火 { color: #c01010; }
+        .el-土 { color: #7a5010; }
+
+        /* ── Result items ── */
+        .result-grid { display: grid; gap: 9px; margin-top: 4px; }
+
+        .result-item {
+            display: flex;
+            align-items: center;
+            padding: 11px 16px;
+            border-radius: 6px;
+            gap: 12px;
+            font-size: 0.96rem;
+        }
+
+        .item-name { flex: 1; }
+        .item-rel  { width: 64px; text-align: center; font-size: 0.9rem; }
+        .item-verdict { font-weight: bold; font-size: 1.1rem; width: 46px; text-align: center; }
+
+        .res-吉   { background: #e8f5e9; border-left: 4px solid #2e7d32; color: #1b5e20; }
+        .res-同   { background: #e3f2fd; border-left: 4px solid #1565c0; color: #0d47a1; }
+        .res-小吉 { background: #f9fbe7; border-left: 4px solid #8bc34a; color: #33691e; }
+        .res-凶   { background: #ffebee; border-left: 4px solid #c62828; color: #b71c1c; }
+
+        .info-box {
+            background: #faf5ec;
+            border: 1px solid #c8a060;
+            border-radius: 6px;
+            padding: 12px 16px;
+            font-size: 0.88rem;
+            line-height: 1.9;
+            margin-bottom: 14px;
+            color: #5a3a1a;
+        }
+
+        /* ── Reference chart ── */
+        .ref-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 6px;
+        }
+
+        .ref-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 1.8rem; }
+            .hexagrams-row { gap: 20px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>六爻起卦</h1>
+    <p class="subtitle">以数起卦 · 观象知吉凶</p>
+
+    <div class="card input-section">
+        <p class="prompt-text">请给出两个数字</p>
+        <div class="input-row">
+            <div class="input-group">
+                <label>第一个数字（成下卦）</label>
+                <input type="number" id="num1" placeholder="数字一" min="1">
+            </div>
+            <div class="input-group">
+                <label>第二个数字（成上卦）</label>
+                <input type="number" id="num2" placeholder="数字二" min="1">
+            </div>
+            <button class="btn" onclick="calculate()">起 卦</button>
+        </div>
+    </div>
+
+    <div id="result"></div>
+</div>
+
+<script>
+// ── 八卦定义 ──
+// lines: [第一爻(底), 第二爻(中), 第三爻(顶)]  1=阳 0=阴
+const TRIGRAMS = {
+    1: { name:'乾', element:'金', lines:[1,1,1] },
+    2: { name:'兑', element:'金', lines:[1,1,0] },
+    3: { name:'离', element:'火', lines:[1,0,1] },
+    4: { name:'震', element:'木', lines:[1,0,0] },
+    5: { name:'巽', element:'木', lines:[0,1,1] },
+    6: { name:'坎', element:'水', lines:[0,1,0] },
+    7: { name:'艮', element:'土', lines:[0,0,1] },
+    8: { name:'坤', element:'土', lines:[0,0,0] }
+};
+
+// 相生: 金→水→木→火→土→金
+const GENERATES = { '金':'水','水':'木','木':'火','火':'土','土':'金' };
+// 相克: 金→木→木→土→土→水→水→火→火→金
+const OVERCOMES = { '金':'木','木':'土','土':'水','水':'火','火':'金' };
+
+function toTrigramNum(n) {
+    const r = Math.abs(Math.floor(n)) % 8;
+    return r === 0 ? 8 : r;
+}
+
+function findTrigram(lines) {
+    for (const [k, t] of Object.entries(TRIGRAMS)) {
+        if (t.lines[0]===lines[0] && t.lines[1]===lines[1] && t.lines[2]===lines[2])
+            return TRIGRAMS[parseInt(k)];
+    }
+    return TRIGRAMS[8];
+}
+
+function getRelation(selfEl, otherEl) {
+    if (selfEl === otherEl)              return { rel:'同我', verdict:'吉',  cls:'res-同'  };
+    if (GENERATES[otherEl] === selfEl)   return { rel:'生我', verdict:'吉',  cls:'res-吉'  };
+    if (OVERCOMES[selfEl]  === otherEl)  return { rel:'我克', verdict:'小吉',cls:'res-小吉'};
+    if (GENERATES[selfEl]  === otherEl)  return { rel:'我生', verdict:'凶',  cls:'res-凶'  };
+    if (OVERCOMES[otherEl] === selfEl)   return { rel:'克我', verdict:'凶',  cls:'res-凶'  };
+    return { rel:'?', verdict:'?', cls:'' };
+}
+
+// ── 画一爻 ──
+function lineHTML(val, isChanging) {
+    const cls = isChanging ? 'changing-line' : '';
+    if (val === 1) {
+        return `<div class="line-gfx ${cls}"><span class="lseg yang-seg"></span></div>`;
+    } else {
+        return `<div class="line-gfx ${cls}"><span class="lseg yin-seg"></span><span class="gap"></span><span class="lseg yin-seg"></span></div>`;
+    }
+}
+
+// ── 画整个卦 ──
+function renderHexagram(hexLines, changingLine, title, lowerTri, upperTri) {
+    // hexLines[0]=爻1(底) … hexLines[5]=爻6(顶)
+    let h = `<div class="hex-block">
+        <div class="hex-title">${title}</div>
+        <div class="tri-label">${upperTri.name}（上）</div>
+        <div class="hex-lines">`;
+
+    for (let i = 5; i >= 0; i--) {
+        const ln = i + 1;
+        const isC = changingLine && ln === changingLine;
+        h += `<div class="hex-line">
+            <span class="line-num">${ln}</span>
+            ${lineHTML(hexLines[i], isC)}
+            ${isC ? '<span class="change-mark">◀变</span>' : ''}
+        </div>`;
+        if (i === 3) h += `<div class="divider"></div>`;
+    }
+
+    h += `</div>
+        <div class="tri-label">${lowerTri.name}（下）</div>
+    </div>`;
+    return h;
+}
+
+function elTag(el) {
+    return `<span class="el el-${el}">${el}</span>`;
+}
+
+// ── 主计算 ──
+function calculate() {
+    const v1 = document.getElementById('num1').value;
+    const v2 = document.getElementById('num2').value;
+    const n1 = parseInt(v1), n2 = parseInt(v2);
+
+    if (!v1 || !v2 || isNaN(n1) || isNaN(n2)) {
+        alert('请输入两个有效数字！');
+        return;
+    }
+
+    const a1 = Math.abs(n1), a2 = Math.abs(n2);
+
+    // 第二步：求卦数
+    const lNum = toTrigramNum(a1);
+    const uNum = toTrigramNum(a2);
+    const lower = TRIGRAMS[lNum];
+    const upper = TRIGRAMS[uNum];
+
+    // 第三步：排卦（下卦爻1-3，上卦爻4-6）
+    // origHex 索引 0=爻1(底) … 5=爻6(顶)
+    const origHex = [
+        lower.lines[0], lower.lines[1], lower.lines[2],
+        upper.lines[0], upper.lines[1], upper.lines[2]
+    ];
+
+    // 第四步：求变爻
+    const sum = a1 + a2;
+    const changingLine = sum % 6 === 0 ? 6 : sum % 6;
+
+    // 变卦
+    const changedHex = [...origHex];
+    changedHex[changingLine - 1] = changedHex[changingLine - 1] === 1 ? 0 : 1;
+
+    const cLower = findTrigram([changedHex[0], changedHex[1], changedHex[2]]);
+    const cUpper = findTrigram([changedHex[3], changedHex[4], changedHex[5]]);
+
+    // 判断哪一卦变了
+    const changedSide = changingLine <= 3 ? '下卦' : '上卦';
+    const changedTri  = changingLine <= 3 ? cLower : cUpper;
+
+    // 互卦（取自本卦）
+    // 下互卦：爻2,3,4 → 索引1,2,3
+    const lnLines = [origHex[1], origHex[2], origHex[3]];
+    // 上互卦：爻3,4,5 → 索引2,3,4
+    const unLines = [origHex[2], origHex[3], origHex[4]];
+    const lowerNuc = findTrigram(lnLines);
+    const upperNuc = findTrigram(unLines);
+    const nucHex = [...lnLines, ...unLines];
+
+    // ── 组件清单 ──
+    const comps = [
+        { label:'本卦下卦', tri: lower    },
+        { label:'本卦上卦', tri: upper    },
+        { label: changedSide==='下卦' ? '变卦下卦' : '变卦上卦', tri: changedTri },
+        { label:'下互卦',   tri: lowerNuc },
+        { label:'上互卦',   tri: upperNuc }
+    ];
+
+    // ── 生成 HTML ──
+    let html = '';
+
+    // 推演过程
+    html += `<div class="card">
+        <h2>推演过程</h2>
+        <table>
+            <tr><th>项目</th><th>计算</th><th>卦象</th></tr>
+            <tr>
+                <td>第一数 → 下卦</td>
+                <td>${a1} ÷ 8，余 <strong>${lNum}</strong></td>
+                <td><strong>${lower.name}</strong>（${lower.element}）</td>
+            </tr>
+            <tr>
+                <td>第二数 → 上卦</td>
+                <td>${a2} ÷ 8，余 <strong>${uNum}</strong></td>
+                <td><strong>${upper.name}</strong>（${upper.element}）</td>
+            </tr>
+            <tr>
+                <td>变爻位置</td>
+                <td>${a1} + ${a2} = ${sum}，${sum} ÷ 6，余 <strong>${changingLine}</strong></td>
+                <td>第 <strong>${changingLine}</strong> 爻变（${changedSide}）</td>
+            </tr>
+        </table>
+    </div>`;
+
+    // 卦象展示
+    html += `<div class="card">
+        <h2>卦象展示</h2>
+        <div class="hexagrams-row">
+            ${renderHexagram(origHex, changingLine, '本卦', lower, upper)}
+            ${renderHexagram(changedHex, null, '变卦', cLower, cUpper)}
+            ${renderHexagram(nucHex, null, '互卦', lowerNuc, upperNuc)}
+        </div>
+        <p style="font-size:0.82rem;color:#999;text-align:center;margin-top:14px">
+            红色爻为变爻 | 互卦取本卦二三四爻（下互）、三四五爻（上互）
+        </p>
+    </div>`;
+
+    // 五行归属
+    html += `<div class="card">
+        <h2>五行归属</h2>
+        <table>
+            <tr><th>部分</th><th>卦名</th><th>五行</th></tr>`;
+    for (const c of comps) {
+        html += `<tr>
+            <td>${c.label}</td>
+            <td><strong>${c.tri.name}</strong></td>
+            <td>${elTag(c.tri.element)}</td>
+        </tr>`;
+    }
+    html += `</table>
+        <div class="ref-row" style="margin-top:14px">
+            <span class="ref-badge" style="background:#fff8e1;color:#b08010;border:1px solid #c8a060">乾兑 → 金</span>
+            <span class="ref-badge" style="background:#e8f5e9;color:#1e8020;border:1px solid #a5d6a7">震巽 → 木</span>
+            <span class="ref-badge" style="background:#e3f2fd;color:#1060cc;border:1px solid #90caf9">坎 → 水</span>
+            <span class="ref-badge" style="background:#ffebee;color:#c01010;border:1px solid #ef9a9a">离 → 火</span>
+            <span class="ref-badge" style="background:#efebe9;color:#7a5010;border:1px solid #bcaaa4">坤艮 → 土</span>
+        </div>
+    </div>`;
+
+    // 生克分析
+    const selfEl = lower.element;
+    html += `<div class="card">
+        <h2>生克分析</h2>
+        <div class="info-box">
+            以 <strong>本卦下卦「${lower.name}」（${lower.element}）</strong> 为「我」<br>
+            生我者为吉 ｜ 同我者为吉 ｜ 我克者小吉 ｜ 我生者为凶 ｜ 克我者为凶
+        </div>
+        <div class="result-grid">`;
+
+    for (const c of comps.slice(1)) {
+        const r = getRelation(selfEl, c.tri.element);
+        html += `<div class="result-item ${r.cls}">
+            <span class="item-name">${c.label}「<strong>${c.tri.name}</strong>」${elTag(c.tri.element)}</span>
+            <span class="item-rel">${r.rel}</span>
+            <span class="item-verdict">${r.verdict}</span>
+        </div>`;
+    }
+
+    html += `</div></div>`;
+
+    const el = document.getElementById('result');
+    el.innerHTML = html;
+    el.scrollIntoView({ behavior: 'smooth' });
+}
+
+// 回车触发
+document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') calculate();
+});
+</script>
+</body>
+</html>
